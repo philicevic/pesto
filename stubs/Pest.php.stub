@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+use Philicevic\Pesto\TestSuite\Feature;
+use Philicevic\Pesto\TestSuite\Functional;
+use Philicevic\Pesto\TestSuite\Unit;
+
+// ---------------------------------------------------------------------------
+// Extension Configuration
+// ---------------------------------------------------------------------------
+// Define which extensions should be loaded for Functional and Feature tests.
+// At minimum, load the extension you are developing/testing.
+
+Feature::loadExtensions([
+    // 'my_sitepackage',
+    // 'my_extension',
+]);
+
+Functional::loadExtensions([
+    // 'my_sitepackage',
+    // 'my_extension',
+]);
+
+// Optionally load additional TYPO3 core extensions (e.g. 'frontend', 'fluid'):
+// Feature::loadCoreExtensions(['frontend', 'fluid']);
+
+// ---------------------------------------------------------------------------
+// Test Suite Mapping
+// ---------------------------------------------------------------------------
+// Map test directories to their corresponding TestSuite base class.
+// Pest uses this to determine which base class each test file extends.
+
+uses(Unit::class)->in('Unit');
+uses(Functional::class)->in('Functional');
+uses(Feature::class)->in('Feature');
+
+// ---------------------------------------------------------------------------
+// Global Datasets (optional)
+// ---------------------------------------------------------------------------
+// Define reusable datasets available to all tests:
+//
+// dataset('typo3Versions', [
+//     'v13.0' => ['13.0.0'],
+//     'v13.4' => ['13.4.0'],
+// ]);
