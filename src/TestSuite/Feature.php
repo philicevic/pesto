@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Philicevic\Pesto\TestSuite;
 
 use Philicevic\Pesto\Support\HttpTestResponse;
+use Symfony\Component\Yaml\Yaml;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 
@@ -24,14 +25,14 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
  * Example tests:
  *   it('renders the homepage', function () {
  *       $this->fixture(__DIR__ . '/Fixtures/pages.csv');
- *       $response = $this->get('http://localhost/');
+ *       $response = $this->get('/');
  *       expect($response)->toHaveStatus(200)->toSee('Welcome');
  *   });
  *
  *   it('shows members-only content when logged in', function () {
  *       $this->fixture(__DIR__ . '/Fixtures/pages.csv');
  *       $this->fixture(__DIR__ . '/Fixtures/fe_users.csv');
- *       $response = $this->actingAsFrontendUser(1)->get('http://localhost/members');
+ *       $response = $this->actingAsFrontendUser(1)->get('/members');
  *       expect($response)->toHaveStatus(200)->toSee('Welcome, Member!');
  *   });
  *
@@ -53,10 +54,13 @@ class Feature extends AbstractTypo3TestCase
 
     private ?InternalRequestContext $requestContext = null;
 
+    private ?string $currentSiteBase = null;
+
     protected function tearDown(): void
     {
         // Reset authentication context so tests don't bleed into each other.
         $this->requestContext = null;
+        $this->currentSiteBase = null;
 
         parent::tearDown();
     }
@@ -64,6 +68,57 @@ class Feature extends AbstractTypo3TestCase
     // -------------------------------------------------------------------------
     // HTTP Request Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Target a specific site for subsequent requests in this test.
+     * The identifier is used to construct the site base as http://{identifier}.localhost/,
+     * matching the URL that SiteConfigWriter assigns to each site in the test instance.
+     *
+     * Example:
+     *   $this->onSite('shop')->get('/')->assertOk();
+     */
+    public function onSite(string $identifier): static
+    {
+        $this->currentSiteBase = 'http://' . $identifier . '.localhost/';
+
+        return $this;
+    }
+
+    /**
+     * Resolve a URL against the current site base.
+     *
+     * If $url already starts with http:// or https://, it is returned as-is.
+     * Otherwise, $currentSiteBase is prepended. If no site has been selected
+     * via onSite(), the base is auto-detected from the first subdirectory under
+     * {instancePath}/typo3conf/sites/ that contains a config.yaml with a valid
+     * string `base` key. The detected value is cached for the duration of the test.
+     */
+    private function resolveUrl(string $url): string
+    {
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        if ($this->currentSiteBase === null) {
+            $sitesPath = $this->instancePath . '/typo3conf/sites';
+            foreach (scandir($sitesPath) ?: [] as $entry) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                $configFile = $sitesPath . '/' . $entry . '/config.yaml';
+                if (!is_dir($sitesPath . '/' . $entry) || !file_exists($configFile)) {
+                    continue;
+                }
+                $config = Yaml::parseFile($configFile);
+                if (is_array($config) && isset($config['base']) && is_string($config['base'])) {
+                    $this->currentSiteBase = $config['base'];
+                    break;
+                }
+            }
+        }
+
+        return ($this->currentSiteBase ?? '') . ltrim($url, '/');
+    }
 
     /**
      * Perform a GET request to the given URL.
@@ -116,7 +171,7 @@ class Feature extends AbstractTypo3TestCase
      */
     public function request(string $method, string $url, array $data = [], array $headers = []): HttpTestResponse
     {
-        $internalRequest = (new InternalRequest($url))->withMethod($method);
+        $internalRequest = (new InternalRequest($this->resolveUrl($url)))->withMethod($method);
 
         foreach ($headers as $name => $value) {
             $internalRequest = $internalRequest->withAddedHeader($name, $value);

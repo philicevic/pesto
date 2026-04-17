@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Philicevic\Pesto\TestSuite;
 
+use Philicevic\Pesto\SiteConfig\SiteConfigWriter;
+use TYPO3\TestingFramework\Composer\ComposerPackageManager;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
@@ -12,6 +14,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
  *
  * Provides:
  *   - Global extension configuration via static loadExtensions()
+ *   - Automatic site configuration linking via static setSiteConfigurationPath()
  *   - Database fixture helpers: fixture(), assertDatabase(), getRecord()
  *   - Database assertion helpers: assertRecordExists(), assertRecordMissing()
  *
@@ -35,6 +38,30 @@ abstract class AbstractTypo3TestCase extends FunctionalTestCase
      * @var list<non-empty-string>
      */
     protected static array $defaultCoreExtensions = [];
+
+    /**
+     * Path to the site configuration directory, relative to the project root.
+     * On setUp(), this directory is copied into the test instance as typo3conf/sites,
+     * with the base URL rewritten to http://{identifier}.localhost/ per site.
+     * TYPO3's site finder can then resolve routes.
+     *
+     * Set to null to disable. Override via setSiteConfigurationPath() in tests/Pest.php.
+     */
+    protected static ?string $siteConfigurationPath = 'config/sites';
+
+    /**
+     * Configure the site configuration directory for all tests.
+     * Pass null to disable automatic site configuration copying.
+     * Call this in tests/Pest.php before running tests.
+     *
+     * Example:
+     *   AbstractTypo3TestCase::setSiteConfigurationPath('config/sites');
+     *   AbstractTypo3TestCase::setSiteConfigurationPath(null); // disable
+     */
+    public static function setSiteConfigurationPath(?string $path): void
+    {
+        static::$siteConfigurationPath = $path;
+    }
 
     /**
      * Configure extensions that should be loaded for all tests of this suite.
@@ -76,6 +103,20 @@ abstract class AbstractTypo3TestCase extends FunctionalTestCase
         ));
 
         parent::setUp();
+
+        // Copy the project site configuration into the test instance so that
+        // TYPO3's site finder can resolve routes. ComposerPackageManager reads
+        // from Composer's installed package metadata, so it always returns the
+        // real project root regardless of what the testing framework sets in env vars.
+        // The copied directory is recursively removed by FunctionalTestCase::tearDown().
+        if (static::$siteConfigurationPath !== null) {
+            $projectRoot = (new ComposerPackageManager())->getRootPath();
+            $sourcePath = rtrim($projectRoot, '/') . '/' . ltrim(static::$siteConfigurationPath, '/');
+            $targetPath = $this->instancePath . '/typo3conf/sites';
+            if (is_dir($sourcePath)) {
+                (new SiteConfigWriter())->write($sourcePath, $targetPath);
+            }
+        }
     }
 
     // -------------------------------------------------------------------------
