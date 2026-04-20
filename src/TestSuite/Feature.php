@@ -101,7 +101,7 @@ class Feature extends AbstractTypo3TestCase
 
         if ($this->currentSiteBase === null) {
             $sitesPath = $this->instancePath . '/typo3conf/sites';
-            foreach (scandir($sitesPath) ?: [] as $entry) {
+            foreach (is_dir($sitesPath) ? (scandir($sitesPath) ?: []) : [] as $entry) {
                 if ($entry === '.' || $entry === '..') {
                     continue;
                 }

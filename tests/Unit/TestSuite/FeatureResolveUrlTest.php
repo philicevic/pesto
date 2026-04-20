@@ -11,12 +11,10 @@ describe('Feature::resolveUrl()', function (): void {
 
         // Expose resolveUrl() via reflection.
         $method = new ReflectionMethod(Feature::class, 'resolveUrl');
-        $method->setAccessible(true);
         $this->resolveUrl = fn(string $url) => $method->invoke($this->feature, $url);
 
         // Expose instancePath via reflection so we can set it without a TYPO3 bootstrap.
         $prop = new ReflectionProperty(Feature::class, 'instancePath');
-        $prop->setAccessible(true);
         $this->setInstancePath = fn(string $path) => $prop->setValue($this->feature, $path);
 
         // Shared temp directory for tests that need a real filesystem.

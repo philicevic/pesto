@@ -116,7 +116,7 @@ class HttpTestResponse
 
         expect($decoded)->toBeArray('Response body is not valid JSON');
 
-        return $decoded; /** @phpstan-ignore-line */
+        return $decoded;
     }
 
     // -------------------------------------------------------------------------

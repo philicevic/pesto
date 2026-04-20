@@ -89,8 +89,7 @@ if (!function_exists('typo3_version')) {
      */
     function typo3_version(): string
     {
-        return \TYPO3\CMS\Core\Information\Typo3Version::getReleaseString()
-            ?? \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version();
+        return \TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version();
     }
 }
 

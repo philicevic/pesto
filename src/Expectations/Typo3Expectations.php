@@ -139,7 +139,7 @@ final class Typo3Expectations
         // expect($typoScriptValue)->toBeTypoScriptEnabled()
         expect()->extend('toBeTypoScriptEnabled', function (): \Pest\Expectation {
             /** @var \Pest\Expectation<mixed> $this */
-            expect($this->value)->toBeOneOf([1, '1', true], 'Expected a truthy TypoScript value (1 or "1").');
+            expect($this->value)->toBeIn([1, '1', true], 'Expected a truthy TypoScript value (1 or "1").');
 
             return $this;
         });
@@ -147,7 +147,7 @@ final class Typo3Expectations
         // expect($typoScriptValue)->toBeTypoScriptDisabled()
         expect()->extend('toBeTypoScriptDisabled', function (): \Pest\Expectation {
             /** @var \Pest\Expectation<mixed> $this */
-            expect($this->value)->toBeOneOf([0, '0', false, ''], 'Expected a falsy TypoScript value (0 or "0").');
+            expect($this->value)->toBeIn([0, '0', false, ''], 'Expected a falsy TypoScript value (0 or "0").');
 
             return $this;
         });
