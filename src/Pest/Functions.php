@@ -8,7 +8,6 @@ declare(strict_types=1);
  * These functions are available in all tests without any import.
  * They are automatically loaded via composer.json's autoload.files.
  */
-
 if (!function_exists('typo3')) {
     /**
      * Access the TYPO3 dependency injection container.

@@ -8,7 +8,6 @@ declare(strict_types=1);
  * Unit tests run without a TYPO3 bootstrap or database.
  * Use them for testing pure PHP logic in your extension.
  */
-
 it('can access the TYPO3 configuration', function (): void {
     // typo3_conf_vars() is a global helper provided by Pesto.
     // In unit tests, TYPO3_CONF_VARS is available if a unit bootstrap is loaded.
@@ -29,9 +28,9 @@ it('can use all standard Pest expectations', function (): void {
         ->toHaveCount(3)
         ->toContain('pesto')
         ->sequence(
-            fn ($item) => $item->toBe('typo3'),
-            fn ($item) => $item->toBe('pest'),
-            fn ($item) => $item->toBe('pesto'),
+            fn($item) => $item->toBe('typo3'),
+            fn($item) => $item->toBe('pest'),
+            fn($item) => $item->toBe('pesto'),
         );
 });
 

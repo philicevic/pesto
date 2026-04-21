@@ -93,7 +93,7 @@ describe('SiteConfigWriter', function (): void {
 
     it('throws a RuntimeException on malformed YAML', function (): void {
         mkdir($this->sourcePath . '/badsite', 0755, true);
-        file_put_contents($this->sourcePath . '/badsite/config.yaml', "invalid: yaml: [unclosed");
+        file_put_contents($this->sourcePath . '/badsite/config.yaml', 'invalid: yaml: [unclosed');
 
         expect(fn() => (new SiteConfigWriter())->write($this->sourcePath, $this->targetPath))
             ->toThrow(\RuntimeException::class);

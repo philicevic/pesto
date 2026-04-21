@@ -38,7 +38,7 @@ class HttpTestResponse
     public function getBody(): string
     {
         if ($this->cachedBody === null) {
-            $this->cachedBody = (string) $this->response->getBody();
+            $this->cachedBody = (string)$this->response->getBody();
         }
 
         return $this->cachedBody;

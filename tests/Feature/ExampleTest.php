@@ -13,7 +13,6 @@ declare(strict_types=1);
  * The $this variable gives access to all methods from
  * \Philicevic\Pesto\TestSuite\Feature (and TYPO3's FunctionalTestCase).
  */
-
 it('can make a GET request to the homepage', function (): void {
     // Import your site fixtures first:
     // $this->fixture(__DIR__ . '/Fixtures/pages.csv');

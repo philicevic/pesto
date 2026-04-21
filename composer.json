@@ -19,7 +19,8 @@
     },
     "require-dev": {
         "pestphp/pest-plugin-type-coverage": "^4.0",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "typo3/coding-standards": "^0.8"
     },
     "autoload": {
         "psr-4": {
@@ -49,5 +50,9 @@
             "typo3/cms-composer-installers": true
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "scripts": {
+        "cs:check": "php-cs-fixer check --diff",
+        "cs:fix": "php-cs-fixer fix"
+    }
 }

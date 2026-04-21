@@ -11,7 +11,6 @@ declare(strict_types=1);
  * The $this variable gives access to all methods from
  * \Philicevic\Pesto\TestSuite\Functional (and TYPO3's FunctionalTestCase).
  */
-
 it('can import CSV fixtures and query records', function (): void {
     // Import a CSV fixture — the filename matches the table name.
     // $this->fixture(__DIR__ . '/Fixtures/pages.csv');
